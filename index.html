@@ -54,11 +54,61 @@ h1{
   color:#999;
 }
 
+/* Grundaufbau der Navigationsleiste */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  padding: 1rem 2rem;
+}
+
+.logo {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Flexbox für die horizontalen Links */
+.nav-links {
+  display: flex;
+  list-style: none; /* Entfernt die Listenpunkte */
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li {
+  margin-left: 20px;
+}
+
+/* Link-Styling */
+.nav-links a {
+  color: #fff;
+  text-decoration: none; /* Entfernt Unterstreichung */
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+/* Interaktivität bei Mauskontakt */
+.nav-links a:hover {
+  color: #ff9900;
+}
+
+
 </style>
 </head>
 <body>
 
-<h1>SPLATOON 3 MAPS</h1>
+
+  <nav class="navbar">
+  <div class="logo">MeinLogo</div>
+  <ul class="nav-links">
+    <li><a href="weapon.html">Weapon List</a></li>
+  </ul>
+</nav>
+
+  
+  <h1>SPLATOON 3 MAPS</h1>
 
 <div id="app" class="grid"></div>
 
