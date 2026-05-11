@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Splatoon Team Board (Supabase)</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<style>
+
+body{
+  margin:0;
+  background:#0a0a0a;
+  color:white;
+  font-family:Arial;
+}
+
+header{
+  padding:20px;
+  text-align:center;
+  background:linear-gradient(90deg,#ff00cc,#ffcc00);
+  color:black;
+  font-weight:bold;
+  font-size:24px;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+}
+
+form{
+  background:#111;
+  padding:15px;
+  border-radius:15px;
+  margin-bottom:20px;
+}
+
+input, select, textarea{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border:none;
+  border-radius:8px;
+  background:#1b1b1b;
+  color:white;
+}
+
+button{
+  width:100%;
+  padding:10px;
+  background:#ff00cc;
+  border:none;
+  color:white;
+  font-weight:bold;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.post{
+  background:#111;
+  padding:15px;
+  margin-bottom:10px;
+  border-radius:12px;
+  border:1px solid #222;
+}
+
+.team{ color:#ff00cc; }
+.lfg{ color:#ffcc00; }
+
+</style>
+</head>
+
+<body>
+
+<header>
+🎮 Splatoon Team Board (Supabase)
+</header>
+
+<div class="container">
+
+<form id="form">
+
+  <select id="type">
+    <option value="team">🟣 Suche Team</option>
+    <option value="lfg">🟡 Suche Mitspieler</option>
+  </select>
+
+  <input id="name" placeholder="Dein Name">
+  <textarea id="msg" placeholder="Deine Nachricht"></textarea>
+
+  <button>Post erstellen</button>
+
+</form>
+
+<div id="posts"></div>
+
+</div>
+
+<script>
+
+// 🔑 SUPABASE CONFIG
+const supabaseUrl = "hpuoorrejpizeepatozr.supabase.co";
+const supabaseKey = "sb_publishable_tLZAYyTFUDL5B8RyhcScMg_eAX5h6L0";
+
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+const form = document.getElementById("form");
+const postsDiv = document.getElementById("posts");
+
+// ➕ POST ERSTELLEN
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  await supabase.from("posts").insert([{
+    type: document.getElementById("type").value,
+    name: document.getElementById("name").value,
+    msg: document.getElementById("msg").value
+  }]);
+
+  form.reset();
+});
+
+// 🔄 LOAD POSTS
+async function loadPosts(){
+
+  let { data } = await supabase
+    .from("posts")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  render(data);
+}
+
+function render(data){
+
+  let html = "";
+
+  data.forEach(p => {
+
+    html += `
+      <div class="post ${p.type}">
+        <b>${p.type === "team" ? "🟣 Suche Team" : "🟡 Suche Mitspieler"}</b>
+        <p><b>${p.name}</b></p>
+        <p>${p.msg}</p>
+      </div>
+    `;
+
+  });
+
+  postsDiv.innerHTML = html;
+}
+
+// 🔄 REALTIME
+supabase
+  .channel('posts')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, payload => {
+    loadPosts();
+  })
+  .subscribe();
+
+loadPosts();
+
+</script>
+
+</body>
+</html>
