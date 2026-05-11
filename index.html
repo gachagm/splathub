@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Splatoon 3 Live Rotations</title>
+
+<style>
+
+body{
+  background:#0b0b0b;
+  color:white;
+  font-family:Arial;
+  padding:30px;
+}
+
+h1{
+  color:#00ff99;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+  gap:20px;
+}
+
+.card{
+  background:#151515;
+  border-radius:20px;
+  overflow:hidden;
+  border:1px solid #333;
+}
+
+.card img{
+  width:100%;
+  height:220px;
+  object-fit:cover;
+}
+
+.content{
+  padding:20px;
+}
+
+.mode{
+  color:#00ff99;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.timer{
+  margin-top:10px;
+  color:#999;
+}
+
+</style>
+</head>
+<body>
+
+<h1>LIVE SPLATOON 3 ROTATIONS</h1>
+
+<div id="app" class="grid"></div>
+
+<script>
+
+async function loadRotations(){
+
+  const response = await fetch(
+    "https://splatoon3.ink/data/schedules.json"
+  );
+
+  const data = await response.json();
+
+  const regular =
+  data.data.regularSchedules.nodes[0];
+
+  const ranked =
+  data.data.bankaraSchedules.nodes[0];
+
+  const xbattle =
+  data.data.xSchedules.nodes[0];
+
+  const sections = [
+
+    {
+      title:"Turf War",
+      mode:"Regular Battle",
+      data:regular.regularMatchSetting
+    },
+
+    {
+      title:"Anarchy Open",
+      mode:ranked.bankaraMatchSettings[0].vsRule.name,
+      data:ranked.bankaraMatchSettings[0]
+    },
+
+    {
+      title:"X Battle",
+      mode:xbattle.xMatchSetting.vsRule.name,
+      data:xbattle.xMatchSetting
+    }
+
+  ];
+
+  let html = "";
+
+  sections.forEach(section=>{
+
+    const stages = section.data.vsStages;
+
+    html += `
+
+    <div class="card">
+
+      <img src="${stages[0].image.url}">
+
+      <div class="content">
+
+        <h2>${section.title}</h2>
+
+        <div class="mode">
+          ${section.mode}
+        </div>
+
+        <p>${stages[0].name}</p>
+        <p>${stages[1].name}</p>
+
+        <div class="timer">
+          LIVE NOW
+        </div>
+
+      </div>
+
+    </div>
+
+    `;
+
+  });
+
+  document.getElementById("app").innerHTML = html;
+
+}
+
+loadRotations();
+
+setInterval(loadRotations,60000);
+
+</script>
+
+</body>
+</html>
